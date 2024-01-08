@@ -1,96 +1,119 @@
-import React from 'react'
-import Component from 'react'
-import { Button, Form } from 'react-bootstrap'
+import React, { Component } from 'react';
+import { Button, Form } from 'react-bootstrap';
 
-class AddComment extends React.Component {
-  state = {
-    comment: {
-      comment: '',
-      rate: 1,
-      elementId: this.props.asin,
-    },
+class AddComment extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      comment: {
+        comment: '',
+        rate: 1,
+        elementId: null,
+      },
+    };
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.asin !== prevProps.asin) {
+      this.setElementId();
+    }
+  }
+
+  setElementId = () => {
+    const { asin } = this.props;
+    this.setState((prevState) => ({
+      comment: {
+        ...prevState.comment,
+        elementId: asin,
+      },
+    }));
+  };
+
   sendComment = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      let response = await fetch(
+      const response = await fetch(
         'https://striveschool-api.herokuapp.com/api/comments',
         {
           method: 'POST',
           body: JSON.stringify(this.state.comment),
           headers: {
             'Content-type': 'application/json',
-            Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTcxZjE3MjBkOGEyMDAwMThhNDhiMzkiLCJpYXQiOjE3MDIyMDU0MjIsImV4cCI6MTcwMzQxNTAyMn0.wI1n2pl7S6ZJIoyOkS5jA5KxlKf2CuvRw700UVblnLo",
+            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NTliOTY3YWUwZGQxZDAwMTgyZDE3MDEiLCJpYXQiOjE3MDQ2OTU0MTgsImV4cCI6MTcwNTkwNTAxOH0.9Lx6rYFI98V5axazCldU7MpOQM1VhxI0ZuGwIwKF_3o',
           },
         }
-      )
+      );
       if (response.ok) {
-        alert('Commento inviato! Grazie!')
+        alert('Comment was sent!');
         this.setState({
           comment: {
             comment: '',
             rate: 1,
-            elementId: this.props.asin,
+            elementId: null,
           },
-        })
+        });
       } else {
-        console.log('error')
-        alert('Errore - Il commento non è stato inviato correttamente!')
+        console.log('error');
+        alert('Something went wrong');
       }
     } catch (error) {
-      console.log('error')
+      console.log('error', error);
     }
-  }
+  };
+
+  handleCommentChange = (e) => {
+    this.setState({
+      comment: {
+        ...this.state.comment,
+        comment: e.target.value,
+      },
+    });
+  };
+
+  handleRateChange = (e) => {
+    this.setState({
+      comment: {
+        ...this.state.comment,
+        rate: parseInt(e.target.value, 10),
+      },
+    });
+  };
 
   render() {
     return (
-      <div className="m-3">
+      <div>
         <Form onSubmit={this.sendComment}>
           <Form.Group>
-            <Form.Label>Cosa ne pensi?</Form.Label>
+            <Form.Label>Comment text</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Commenta qui..."
+              placeholder="Add comment here"
               value={this.state.comment.comment}
-              onChange={(e) =>
-                this.setState({
-                  comment: {
-                    ...this.state.comment,
-                    comment: e.target.value,
-                  },
-                })
-              }
+              onChange={this.handleCommentChange}
             />
           </Form.Group>
           <Form.Group>
-            <Form.Label>Valuta</Form.Label>
+            <Form.Label>Rating</Form.Label>
             <Form.Control
               as="select"
               value={this.state.comment.rate}
-              onChange={(e) =>
-                this.setState({
-                  comment: {
-                    ...this.state.comment,
-                    rate: e.target.value,
-                  },
-                })
-              }
+              onChange={this.handleRateChange}
             >
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
+              <option value={1}>1</option>
+              <option value={2}>2</option>
+              <option value={3}>3</option>
+              <option value={4}>4</option>
+              <option value={5}>5</option>
             </Form.Control>
           </Form.Group>
           <Button variant="primary" type="submit">
-            Invia il commento
+            Submit
           </Button>
         </Form>
       </div>
-    )
+    );
   }
 }
 
-export default AddComment
+export default AddComment;

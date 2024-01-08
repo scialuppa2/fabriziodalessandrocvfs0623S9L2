@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import { Card, Col, } from 'react-bootstrap';
-import Component from 'react';
-import CommentArea from './CommentArea';
 
 /*const SingleBook = (props) => {
     const [selected, setSelected] = useState(false);
@@ -26,32 +24,28 @@ import CommentArea from './CommentArea';
 
 export default SingleBook;*/
 
-class SingleBook extends React.Component {
-    state = {
-        selected: false,
-    };
-
-
+class SingleBook extends Component {
     render() {
-        return (
-            <Col xs={6} md={4} lg={3}>
-                <Card
-                    className='custom-card'
-                    onClick={() => this.setState({ selected: !this.state.selected })}
-                    style={{ border: this.state.selected ? '2px solid black' : 'none' }}
-                >
-                    <Card.Img variant="top" src={this.props.book.img} />
-                    <Card.Body>
-                        <Card.Title style={{ color: 'black' }}>{this.props.book.title}</Card.Title>
-                        <Card.Text>{this.props.book.price} Euro</Card.Text>
-                    </Card.Body>
-                </Card>
-                {this.state.selected && <CommentArea asin={this.props.book.asin} />}
+        const { changeSelectedBook, selectedBook, book } = this.props;
 
-            </Col>
+        return (
+            <>
+                
+                    <Card
+                        onClick={() => changeSelectedBook(book.asin)}
+                        style={{
+                            border: selectedBook === book.asin ? '3px solid black' : 'none',
+                        }}
+                    >
+                        <Card.Img variant="top" src={book.img} />
+                        <Card.Body>
+                            <Card.Title style={{ color: 'black' }}>{book.title}</Card.Title>
+                        </Card.Body>
+                    </Card>
+                
+            </>
         );
     }
-
 }
 
 export default SingleBook;
